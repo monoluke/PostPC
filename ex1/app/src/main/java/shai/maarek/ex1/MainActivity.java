@@ -7,7 +7,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.content.Intent;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     TextView textView;
     EditText editText;
@@ -24,12 +23,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button button = (Button)findViewById(R.id.Button0);
         this.editText = (EditText)findViewById(R.id.editText0);
 
+        this.editText.setText(R.string.edit_text);
+        button.setText(R.string.button);
+        this.textView.setText(R.string.text_view);
+
         this.textView.requestFocus();
         button.setOnClickListener(this);
 //        editText.setSelectAllOnFocus(true);
 //        this.editText.setOnClickListener(this);
-
-
 //        View.OnFocusChangeListener ofcListener = new MyFocusChangeListener();
 //        editText.setOnFocusChangeListener(ofcListener);
 
@@ -50,33 +51,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view){
-//        switch(view.getId()){
-//            case R.id.Button0:
                 this.editText.onEditorAction(EditorInfo.IME_ACTION_DONE);
                 this.textView.setText(editText.getText());
-//                break;
-
-//            case R.id.editText0:
-//                this.editText.getText().clear();
-//                this.editText.selectAll();
-//                this.editText.onEditorAction(EditorInfo.IME_ACTION_DONE);
-//                break;
-//        }
-
     }
-//    class MyFocusChangeListener implements View.OnFocusChangeListener {
-//        public void onFocusChange(View v, boolean hasFocus){
-//
-//            if(v.getId() == R.id.editText0 && !hasFocus) {
-//
-//                InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                assert imm != null;
-//                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-//
-//            }
-//        }
-//
-//    }
 
 
 }
