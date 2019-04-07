@@ -29,10 +29,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.textView.requestFocus();
         button.setOnClickListener(this);
-//        editText.setSelectAllOnFocus(true);
-//        this.editText.setOnClickListener(this);
-//        View.OnFocusChangeListener ofcListener = new MyFocusChangeListener();
-//        editText.setOnFocusChangeListener(ofcListener);
 
 
     }
@@ -53,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view){
                 this.editText.onEditorAction(EditorInfo.IME_ACTION_DONE);
                 this.textView.setText(editText.getText());
+                this.editText.setText("");
     }
 
 
