@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -61,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onRestoreInstanceState(Bundle state){
         super.onRestoreInstanceState(state);
-        this.textMessages = state.getStringArrayList(KEY_MSG_LIST);
-//        this.textView.setText(state.getString(TEXTBOX_STRING));
+//        Collections.copy(this.textMessages, state.getStringArrayList(KEY_MSG_LIST));
+        this.textMessages.addAll(Objects.requireNonNull(state.getStringArrayList(KEY_MSG_LIST)));
         this.adapter.notifyDataSetChanged();
 
     }
