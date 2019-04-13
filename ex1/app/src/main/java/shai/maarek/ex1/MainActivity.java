@@ -1,5 +1,6 @@
 package shai.maarek.ex1;
 
+import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +12,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView textView;
     EditText editText;
     final String TEXTBOX_STRING = "";
+    private static final String TAG = "mainActivity";
 
 
     @Override
