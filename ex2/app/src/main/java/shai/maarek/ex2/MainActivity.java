@@ -33,9 +33,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
 
-        Button button = (Button) findViewById(R.id.Button0);
-        this.editText = (EditText) findViewById(R.id.editText0);
-        this.recyclerView = (RecyclerView) findViewById(R.id.recyclerView0);
+        Button button =findViewById(R.id.Button0);
+        this.editText =findViewById(R.id.editText0);
+        this.recyclerView = findViewById(R.id.recyclerView0);
 
         this.editText.setText(R.string.edit_text);
         button.setText(R.string.button);
