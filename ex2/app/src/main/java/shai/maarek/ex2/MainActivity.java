@@ -11,14 +11,12 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     EditText editText;
     RecyclerView recyclerView;
     private ArrayList<String> textMessages = new ArrayList<>();
@@ -35,9 +33,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
 
-        Button button = (Button)findViewById(R.id.Button0);
-        this.editText = (EditText)findViewById(R.id.editText0);
-        this.recyclerView = (RecyclerView)findViewById(R.id.recyclerView0);
+        Button button = (Button) findViewById(R.id.Button0);
+        this.editText = (EditText) findViewById(R.id.editText0);
+        this.recyclerView = (RecyclerView) findViewById(R.id.recyclerView0);
 
         this.editText.setText(R.string.edit_text);
         button.setText(R.string.button);
@@ -54,33 +52,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
-        //todo when rotating save state - save arraylist
         super.onSaveInstanceState(state);
         state.putStringArrayList(KEY_MSG_LIST, this.textMessages);
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle state){
+    protected void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
-//        Collections.copy(this.textMessages, state.getStringArrayList(KEY_MSG_LIST));
-        this.textMessages.addAll(Objects.requireNonNull(state.getStringArrayList(KEY_MSG_LIST)));
+        this.textMessages.clear();
+        ArrayList<String> lkmlkm = state.getStringArrayList(KEY_MSG_LIST);
+        if (lkmlkm != null) {
+            this.textMessages.addAll(lkmlkm);
+        }
         this.adapter.notifyDataSetChanged();
 
     }
 
     @Override
-       public void onClick(View view){
-        Log.d(TAG, "~~~onClick: in onClick");
-        if (editText.getText().toString().trim().equals("")){
-            //    private static final String SAVED_RECYCLER_VIEW_STATUS_ID = "Saved_Recycler_View_Status";
-            //    private static final String SAVED_RECYCLER_VIEW_DATASET_ID = "Saved_Recycler_view_Dataset";
+    public void onClick(View view) {
+//        Log.d(TAG, "~~~onClick: in onClick");
+        if (editText.getText().toString().trim().equals("")) {
             String EMPTY_STRING_MSG = "Bip Boop. You cannot send an empty message.";
-            Toast.makeText(getApplicationContext(), EMPTY_STRING_MSG,Toast.LENGTH_SHORT).show();
-        }
-        else{
+            Toast.makeText(getApplicationContext(), EMPTY_STRING_MSG, Toast.LENGTH_SHORT).show();
+        } else {
             this.textMessages.add(editText.getText().toString());
-            Log.d(TAG, "~~~onClick: "+this.textMessages.get(this.textMessages.size()-1));
-            Log.d(TAG, "~~~onClick: "+this.textMessages.size());
+//            Log.d(TAG, "~~~onClick: " + this.textMessages.get(this.textMessages.size() - 1));
+//            Log.d(TAG, "~~~onClick: " + this.textMessages.size());
             this.adapter.notifyDataSetChanged();
         }
 
