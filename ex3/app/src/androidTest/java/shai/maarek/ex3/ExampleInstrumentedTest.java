@@ -1,4 +1,4 @@
-package shai.maarek.ex2;
+package shai.maarek.ex3;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("shai.maarek.ex2", appContext.getPackageName());
+        assertEquals("shai.maarek.ex3", appContext.getPackageName());
     }
 }

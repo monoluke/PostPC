@@ -1,4 +1,4 @@
-package shai.maarek.ex2;
+package shai.maarek.ex3;
 
 import org.junit.Test;
 
