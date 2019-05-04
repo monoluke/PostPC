@@ -26,4 +26,7 @@ public class MessageViewModel extends AndroidViewModel {
         mRepository.insert(message);
     }
 
+    public MessageRepository getmRepository() {
+        return mRepository;
+    }
 }

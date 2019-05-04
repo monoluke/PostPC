@@ -8,6 +8,14 @@ import java.util.List;
 import androidx.lifecycle.LiveData;
 
 public class MessageRepository {
+    public MessageDao getmMessageDao() {
+        return mMessageDao;
+    }
+
+    public LiveData<List<Message>> getmAllMessages() {
+        return mAllMessages;
+    }
+
     private MessageDao mMessageDao;
     private LiveData<List<Message>> mAllMessages;
 

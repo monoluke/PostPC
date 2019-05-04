@@ -5,25 +5,40 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-//import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private static final String TAG = "RecyclerViewAdapter";
 
     private List<Message> textMessages;
     private Context context;
 
+
+    //
+    private TextView nameTextView;
+    //    private Fragment mFragment;
+
     public RecyclerViewAdapter(Context context) {
         this.context = context;
+
+//        itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                int p=getLayoutPosition();
+//
+//                Notes notes = mNotes.get(p);
+//                Toast.makeText(getContext(), "Recycle Click" + p +"  ", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
+//    public RecyclerViewAdapter(Fragment fragment) {
+//        this.mFragment = fragment;
+//    }
+
 
     // responsible for inflating the view
     @NonNull
@@ -41,6 +56,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if(textMessages != null){
             Message current = textMessages.get(i);
             viewHolder.textView.setText(current.getMMessage());
+
         }
         else{
             viewHolder.textView.setText("no messages");
@@ -62,17 +78,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
-//        CircleImageView circleImageView;
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
-//        ConstraintLayout recyclerViewLayout;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.textView);
-//            recyclerViewLayout = itemView.findViewById(R.id.recyclerViewLayout);
+//            itemView.setOnLongClickListener(this);
         }
+//        @Override
+//        public boolean onLongClick(View view) {
+//            // Handle long click
+//            // Return true to indicate the click was handled
+//            System.out.println("+++onLongClick:  "+ getAdapterPosition());
+//
+//            return true;
+//        }
+
     }
+
 
 
 }

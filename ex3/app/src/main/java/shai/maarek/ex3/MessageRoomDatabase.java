@@ -30,8 +30,6 @@ public abstract class MessageRoomDatabase extends RoomDatabase {
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
         private final MessageDao mDao;
-//        String[] messages = {"dolphin", "crocodile", "cobra"};
-//        String[] messages = {"dolphin"};
 
         PopulateDbAsync(MessageRoomDatabase db) {
             mDao = db.messageDao();

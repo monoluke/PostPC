@@ -1,13 +1,16 @@
 package shai.maarek.ex3;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -19,18 +22,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     EditText editText;
-//    RecyclerView recyclerView;
-//    private RecyclerView.Adapter adapter;
-
-
-
     private static final String KEY_MSG_LIST = "KEY_MSG_LIST";
     private static final String TAG = "mainActivity";
     private static final String SAVED_SUPER_STATE = "super-state";
     private static final String SAVED_LAYOUT_MANAGER = "layout-manager-state";
     private MessageViewModel mMessageViewModel;
-    private ArrayList<String> textMessages = new ArrayList<>();
-
+//    private ArrayList<String> textMessages = new ArrayList<>();
 
 
     @Override
@@ -44,19 +41,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final RecyclerViewAdapter adapter = new RecyclerViewAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-//
         Button button = findViewById(R.id.Button0);
         this.editText = findViewById(R.id.editText0);
-//
         this.editText.setText(R.string.edit_text);
         button.setText(R.string.button);
-
-
         button.setOnClickListener(this);
 
 
-//        this.adapter = new RecyclerViewAdapter(textMessages, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mMessageViewModel.getmAllMessages().observe(this, new Observer<List<Message>>() {
@@ -67,45 +58,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        recyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getApplicationContext(), recyclerView, new RecyclerViewClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+
+//                Toast.makeText(getApplicationContext(), mMessageViewModel.getmAllMessages().[position] + " is clicked!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                new AlertDialog.Builder(view.getContext())
+                        .setTitle("Delete message?")
+                        .setMessage("The selected message will be deleted")
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            List<Message> messageList = mMessageViewModel.getmAllMessages().getValue();
+                            if (messageList != null && messageList.size() >= position) {
+                                Message messageToRemove = messageList.get(position);
+                                mMessageViewModel.getmRepository().getmMessageDao().deleteMessage(messageToRemove);
+                                Toast.makeText(getApplicationContext(), "Deleted message!", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .show();
+            }
+        }));
+
 
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
 
-//        state.putStringArrayList(KEY_MSG_LIST, this.textMessages);
     }
-//
-//    @Override
-//    protected void onRestoreInstanceState(Bundle state) {
-//        super.onRestoreInstanceState(state);
-//        this.textMessages.clear();
-//        ArrayList<String> lkmlkm = state.getStringArrayList(KEY_MSG_LIST);
-//        if (lkmlkm != null) {
-//            this.textMessages.addAll(lkmlkm);
-//        }
-//        this.adapter.notifyDataSetChanged();
-//    }
-//
+
+
     @Override
     public void onClick(View view) {
         if (editText.getText().toString().trim().equals("")) {
             String EMPTY_STRING_MSG = "Bip Boop. You cannot send an empty message.";
             Toast.makeText(getApplicationContext(), EMPTY_STRING_MSG, Toast.LENGTH_SHORT).show();
         } else {
-//            String message = editText.getText().toString();
             Message message1 = new Message(editText.getText().toString());
             mMessageViewModel.insert(message1);
-//            this.textMessages.add(editText.getText().toString());
-//            this.adapter.notifyDataSetChanged();
         }
-//
         this.editText.onEditorAction(EditorInfo.IME_ACTION_DONE);
         this.editText.setText("");
 
     }
-
 
 
 }

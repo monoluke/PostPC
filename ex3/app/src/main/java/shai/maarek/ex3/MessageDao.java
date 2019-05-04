@@ -18,6 +18,9 @@ public interface MessageDao {
     @Query("DELETE FROM message_table")
     void deleteAll();
 
+//    @Query("DELETE FROM users WHERE user_id = :userId")
+//    void deleteByUserId(long userId);
+
     @Delete
     public void deleteMessage(Message message);
 
