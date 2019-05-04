@@ -2,6 +2,7 @@ package shai.maarek.ex3;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class MessageRepository {
         return mAllMessages;
     }
 
-    public void insert (Message message) {
+    public void insert(Message message) {
         new insertAsyncTask(mMessageDao).execute(message);
     }
 

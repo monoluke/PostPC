@@ -2,6 +2,9 @@ package shai.maarek.ex3;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -12,7 +15,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 @Database(entities = {Message.class}, version = 1)
 public abstract class MessageRoomDatabase extends RoomDatabase {
     public abstract MessageDao messageDao();
-
     private static MessageRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback(){
@@ -33,6 +35,7 @@ public abstract class MessageRoomDatabase extends RoomDatabase {
 
         PopulateDbAsync(MessageRoomDatabase db) {
             mDao = db.messageDao();
+
         }
 
         @Override
@@ -58,6 +61,7 @@ public abstract class MessageRoomDatabase extends RoomDatabase {
                             .allowMainThreadQueries()
                             .addCallback(sRoomDatabaseCallback)
                             .build();
+
                 }
             }
 //                if (INSTANCE == null) {

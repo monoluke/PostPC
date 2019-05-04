@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         this.mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
         RecyclerView recyclerView = findViewById(R.id.recyclerView0);
@@ -43,17 +44,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         Button button = findViewById(R.id.Button0);
         this.editText = findViewById(R.id.editText0);
-        this.editText.setText(R.string.edit_text);
+        this.editText.setText("");
         button.setText(R.string.button);
         button.setOnClickListener(this);
 
 
-        recyclerView.setAdapter(adapter);
+        //  recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mMessageViewModel.getmAllMessages().observe(this, new Observer<List<Message>>() {
+
             @Override
             public void onChanged(@Nullable final List<Message> words) {
+                String TAG = "MessageInit";
+                String MSG = "Current size of chat messages list:  ";
                 // Update the cached copy of the words in the adapter.
+                if (adapter.getTextMessages() == null && words != null) {
+                    Log.d(TAG, MSG + words.size());
+                }
                 adapter.setTextMessages(words);
             }
         });

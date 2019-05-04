@@ -6,13 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import java.util.List;
+import java.util.Objects;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    private static final String TAG = "RecyclerViewAdapter";
+//    private static final String TAG = "RecyclerViewAdapter";
+
+    public List<Message> getTextMessages() {
+        return textMessages;
+    }
 
     private List<Message> textMessages;
     private Context context;
@@ -24,7 +31,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public RecyclerViewAdapter(Context context) {
         this.context = context;
-
 //        itemView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -52,28 +58,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        Log.d(TAG, "+++onBindViewHolder: "+ textMessages.get(i));
-        if(textMessages != null){
+//        Log.d(TAG, "+_+_+onBindViewHolder: "+ textMessages.get(i));
+        if (textMessages != null) {
             Message current = textMessages.get(i);
             viewHolder.textView.setText(current.getMMessage());
 
-        }
-        else{
+        } else {
             viewHolder.textView.setText("no messages");
         }
     }
 
-    public void setTextMessages (List<Message> messages){
+    public void setTextMessages(List<Message> messages) {
         textMessages = messages;
         notifyDataSetChanged();
-    }
+    }  // todo
 
     @Override
     public int getItemCount() {
         if (textMessages != null) {
             return this.textMessages.size();
-        }
-        else{
+        } else {
             return 0;
         }
     }
@@ -97,7 +101,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 //        }
 
     }
-
 
 
 }

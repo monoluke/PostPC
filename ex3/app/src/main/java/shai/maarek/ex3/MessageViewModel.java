@@ -1,8 +1,10 @@
 package shai.maarek.ex3;
 
 import android.app.Application;
+import android.util.Log;
 
 import java.util.List;
+import java.util.Objects;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -15,6 +17,14 @@ public class MessageViewModel extends AndroidViewModel {
         super(application);
         mRepository = new MessageRepository(application);
         mAllMessages = mRepository.getAllMessages();
+//        String LOG_MSG_LIST = " Current size of chat messages list: ";
+//        String TAG = "+_+_+";
+//        try{
+//            Log.d(TAG, LOG_MSG_LIST + Objects.requireNonNull(mAllMessages.getValue()).size());
+//        }
+//        catch (NullPointerException nullPointerException){
+//            Log.d(TAG, LOG_MSG_LIST + "0");
+//        }
     }
 
     LiveData<List<Message>> getmAllMessages(){
