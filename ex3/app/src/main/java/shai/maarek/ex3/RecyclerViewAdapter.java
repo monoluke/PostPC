@@ -71,7 +71,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void setTextMessages(List<Message> messages) {
         textMessages = messages;
         notifyDataSetChanged();
-    }  // todo
+    }
 
     @Override
     public int getItemCount() {
