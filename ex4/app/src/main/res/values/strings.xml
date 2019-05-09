@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Ex3</string>
+    <string name="edit_text">Enter message</string>
+    <string name="button">Send</string>
+    <string name="text_view">Your message will appear here</string>
+
+</resources>
