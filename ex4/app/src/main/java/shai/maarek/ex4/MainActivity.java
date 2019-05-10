@@ -9,11 +9,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.List;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,11 +27,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String SAVED_SUPER_STATE = "super-state";
     private static final String SAVED_LAYOUT_MANAGER = "layout-manager-state";
     private MessageViewModel mMessageViewModel;
-//    private ArrayList<String> textMessages = new ArrayList<>();
+    //    private ArrayList<String> textMessages = new ArrayList<>();
+    FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null) {
+//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+//                    moveTaskToBack(true);
+                    finish();
+                }
+            }
+        };
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -47,18 +63,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //  recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mMessageViewModel.getmAllMessages().observe(this, new Observer<List<Message>>() {
-
-            @Override
-            public void onChanged(@Nullable final List<Message> words) {
-                String TAG = "MessageInit";
-                String MSG = "Current size of chat messages list:  ";
-                // Update the cached copy of the words in the adapter.
-                if (adapter.getTextMessages() == null && words != null) {
-                    Log.d(TAG, MSG + words.size());
-                }
-                adapter.setTextMessages(words);
+        mMessageViewModel.getmAllMessages().observe(this, words -> {
+            String TAG = "MessageInit";
+            String MSG = "Current size of chat messages list:  ";
+            // Update the cached copy of the words in the adapter.
+            if (adapter.getTextMessages() == null && words != null) {
+                Log.d(TAG, MSG + words.size());
             }
+            adapter.setTextMessages(words);
         });
 
         recyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getApplicationContext(), recyclerView, new RecyclerViewClickListener() {
@@ -88,6 +100,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
+//
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        mAuth.addAuthStateListener(mAuthListener);
+//    }
 
 
     @Override
