@@ -9,15 +9,16 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Message.class}, version = 1)
+@Database(entities = {Message.class}, version = 3)
 public abstract class MessageRoomDatabase extends RoomDatabase {
     public abstract MessageDao messageDao();
+
     private static MessageRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
-            new RoomDatabase.Callback(){
+            new RoomDatabase.Callback() {
 
                 @Override
-                public void onOpen (@NonNull SupportSQLiteDatabase db){
+                public void onOpen(@NonNull SupportSQLiteDatabase db) {
                     super.onOpen(db);
                     new PopulateDbAsync(INSTANCE).execute();
                 }
@@ -49,6 +50,7 @@ public abstract class MessageRoomDatabase extends RoomDatabase {
             return null;
         }
     }
+
     static MessageRoomDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (MessageRoomDatabase.class) {
@@ -56,6 +58,7 @@ public abstract class MessageRoomDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), MessageRoomDatabase.class, "message_database")
                             .allowMainThreadQueries()
+                            .fallbackToDestructiveMigration()
                             .addCallback(sRoomDatabaseCallback)
                             .build();
 
@@ -72,8 +75,6 @@ public abstract class MessageRoomDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
-
-
 
 
 }

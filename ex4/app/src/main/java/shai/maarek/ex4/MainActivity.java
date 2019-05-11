@@ -1,6 +1,8 @@
 package shai.maarek.ex4;
 
 import android.app.AlertDialog;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,10 +13,20 @@ import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,36 +34,63 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     EditText editText;
-    private static final String KEY_MSG_LIST = "KEY_MSG_LIST";
-    private static final String TAG = "mainActivity";
-    private static final String SAVED_SUPER_STATE = "super-state";
-    private static final String SAVED_LAYOUT_MANAGER = "layout-manager-state";
+    private static RecyclerViewAdapter adapter;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private DatabaseReference mDatabase;
     private MessageViewModel mMessageViewModel;
-    //    private ArrayList<String> textMessages = new ArrayList<>();
-    FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+    private Boolean initialized = false;
+    private long idSync = 0;
 
+    static class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
+        private MessageViewModel mMessageViewModel = null;
+        private DataSnapshot dataSnapshot = null;
+        private ExampleAsyncTaskListener listener;
+
+        public void setListener(ExampleAsyncTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface ExampleAsyncTaskListener {
+            void onExampleAsyncTaskFinished(Void value);
+        }
+
+        public void setData(DataSnapshot dataSnapshot, MessageViewModel messageViewModel) {
+            this.dataSnapshot = dataSnapshot;
+            this.mMessageViewModel = messageViewModel;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        protected Void doInBackground(Void... param) {
+            List<Message> messagesFromDB = new ArrayList<>();
+            dataSnapshot.getChildren().forEach(x -> messagesFromDB.add(x.getValue(Message.class)));
+            this.mMessageViewModel.insertBulk(messagesFromDB);
+            Log.d("Init", String.format("Loaded %s messages from DB", messagesFromDB.size()));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void value) {
+            super.onPostExecute(value);
+            if (listener != null) {
+                listener.onExampleAsyncTaskFinished(value);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FirebaseApp.initializeApp(this);
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null) {
-//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-//                    moveTaskToBack(true);
-                    finish();
-                }
-            }
-        };
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        this.mMessageViewModel.clear();
         RecyclerView recyclerView = findViewById(R.id.recyclerView0);
-        final RecyclerViewAdapter adapter = new RecyclerViewAdapter(this);
+        adapter = new RecyclerViewAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         Button button = findViewById(R.id.Button0);
@@ -60,13 +99,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button.setText(R.string.button);
         button.setOnClickListener(this);
 
+        mDatabase.child("users").child(mFirebaseUser.getUid()).addChildEventListener(new ChildEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                AsyncTaskRunner asyncTaskRunner = new AsyncTaskRunner();
+                asyncTaskRunner.setListener(value -> {
+                    Toast.makeText(getApplicationContext(), "Finished Loading Messages from Firebase!", Toast.LENGTH_SHORT).show();
+                    initialized = true;
+                });
+                asyncTaskRunner.setData(dataSnapshot, mMessageViewModel);
+                asyncTaskRunner.execute();
+            }
 
-        //  recyclerView.setAdapter(adapter);
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if (!initialized) {
+                    return;
+                }
+                mMessageViewModel.insert(dataSnapshot.getValue(Message.class));
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                Toast.makeText(getApplicationContext(), "Deleted message!", Toast.LENGTH_SHORT).show();
+                Message message = dataSnapshot.getValue(Message.class);
+                mMessageViewModel.delete(message);
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mMessageViewModel.getmAllMessages().observe(this, words -> {
+        mMessageViewModel.getmAllMessages().observeForever(words -> {
             String TAG = "MessageInit";
             String MSG = "Current size of chat messages list:  ";
-            // Update the cached copy of the words in the adapter.
             if (adapter.getTextMessages() == null && words != null) {
                 Log.d(TAG, MSG + words.size());
             }
@@ -76,8 +174,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getApplicationContext(), recyclerView, new RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
-
-//                Toast.makeText(getApplicationContext(), mMessageViewModel.getmAllMessages().[position] + " is clicked!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -89,31 +185,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             List<Message> messageList = mMessageViewModel.getmAllMessages().getValue();
                             if (messageList != null && messageList.size() >= position) {
                                 Message messageToRemove = messageList.get(position);
-                                mMessageViewModel.getmRepository().getmMessageDao().deleteMessage(messageToRemove);
-                                Toast.makeText(getApplicationContext(), "Deleted message!", Toast.LENGTH_SHORT).show();
+                                mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").child(messageToRemove.getId()).removeValue();
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)
                         .show();
             }
         }));
-
-
     }
-//
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        mAuth.addAuthStateListener(mAuthListener);
-//    }
-
-
-    @Override
-    protected void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
-
-    }
-
 
     @Override
     public void onClick(View view) {
@@ -121,15 +200,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String EMPTY_STRING_MSG = "Bip Boop. You cannot send an empty message.";
             Toast.makeText(getApplicationContext(), EMPTY_STRING_MSG, Toast.LENGTH_SHORT).show();
         } else {
-            Message message1 = new Message(editText.getText().toString());
-            mMessageViewModel.insert(message1);
+            Message item = new Message(editText.getText().toString());
+            long timeInMillis = Calendar.getInstance().getTimeInMillis() + ++idSync;
+            item.setTimestamp(timeInMillis);
+            String key = mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").push().getKey();
+            item.setId(key);
+            mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").child(key).setValue(item);
+            editText.setText("");
         }
         this.editText.onEditorAction(EditorInfo.IME_ACTION_DONE);
         this.editText.setText("");
-
     }
-
-
 }
 
 

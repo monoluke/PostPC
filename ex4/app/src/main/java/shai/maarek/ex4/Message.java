@@ -8,25 +8,51 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "message_table")
 public class Message {
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     private int key;
 
-    @NonNull
-    @ColumnInfo(name = "message")
-    private String mMessage;
+    private String id;
+    private String message;
+    private long timestamp;
 
-
-
-    public Message(@NonNull String message){
-        this.mMessage = message;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setKey(int key){ this.key=key; }
-
-    public int getKey() { return this.key; }
-
-    public String getMMessage(){
-        return this.mMessage;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
+
+    public Message() {
+    }
+
+    public Message(String message) {
+        this.message = message;
+    }
+
+
+    public void setKey(int key) {
+        this.key = key;
+    }
+
+    public int getKey() {
+        return this.key;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
 }

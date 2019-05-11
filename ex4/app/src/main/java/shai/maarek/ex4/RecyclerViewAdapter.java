@@ -1,11 +1,13 @@
 package shai.maarek.ex4;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -59,7 +61,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 //        Log.d(TAG, "+_+_+onBindViewHolder: "+ textMessages.get(i));
         if (textMessages != null) {
             Message current = textMessages.get(i);
-            viewHolder.textView.setText(current.getMMessage());
+            viewHolder.textView.setText(current.getMessage());
 
         } else {
             viewHolder.textView.setText("no messages");
@@ -71,6 +73,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyDataSetChanged();
     }
 
+    public void addTextMessage(Message message) {
+        if (textMessages == null) {
+            textMessages = new ArrayList<>();
+        }
+        textMessages.add(message);
+        notifyDataSetChanged();
+    }
+
+
     @Override
     public int getItemCount() {
         if (textMessages != null) {
@@ -78,6 +89,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         } else {
             return 0;
         }
+    }
+
+    @SuppressLint("NewApi")
+    public void removeMessage(Message message) {
+        this.textMessages.removeIf(x -> x.getId().equals(message.getId()));
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
