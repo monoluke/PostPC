@@ -21,17 +21,26 @@ public class FragmentMain extends Fragment implements View.OnClickListener {
 
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View v = inflater.inflate(R.layout.fragment_main, container, false);
 
-        Button goFishButton = v.findViewById(R.id.goFishButton1);
-        goFishButton.setText("Go Fish!");
-        goFishButton.setOnClickListener(this);
+            String TAG = "ha";
+            Log.d(TAG, "onCreate: ");
+            Button goFishButton = v.findViewById(R.id.goFishButton1);
+            goFishButton.setText("Go Fish!");
+            goFishButton.setOnClickListener(this);
 
-        TextView digitsView = v.findViewById(R.id.digitsView1);
-        digitsView.setText("Tap on me!");
-        digitsView.setOnClickListener(this);
+            TextView digitsView = v.findViewById(R.id.digitsView1);
+            digitsView.setText("Tap on me!");
+            digitsView.setOnClickListener(this);
 
-        this.digitsShow = v.findViewById(R.id.digitsView2);
+            this.digitsShow = v.findViewById(R.id.digitsView2);
+
+        if (savedInstanceState != null) {
+            this.digitsShow.setText(savedInstanceState.getString("5nums"));
+
+        }
+
 
         return v;
 
@@ -73,13 +82,22 @@ public class FragmentMain extends Fragment implements View.OnClickListener {
     }
 
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("5nums",this.digitsShow.getText().toString());
+    }
+
+
+
 //    @Override
 //    public void onInputSent(CharSequence input) {
 //        this.digitsShow.setText(input);
 //    }
 
 //    @Override
-//    public void onAttach(Context context) {
+ //    public void onAttach(Context context) {
 //        super.onAttach(context);
 //        // check if activity / fragment implements the listener FragmentDigitsListener
 //        if (context instanceof FragmentDigits.FragmentDigitsListener){

@@ -71,15 +71,15 @@ public class FragmentDigits extends Fragment {
 
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
 //        Fragment mainFrag = getFragmentManager().findFragmentById(R.id.container_main);
 //        FragmentTransaction transaction = getFragmentManager().beginTransaction();
 //        transaction.show(mainFrag);
 //        transaction.commit();
 //        listener = null;
-    }
+//    }
 
 //    @Override
 //    public void onAttach(Context context) {

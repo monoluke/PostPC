@@ -15,19 +15,30 @@ public class MainActivity extends AppCompatActivity  {
 
 //    private FragmentGofish fragmentGofish;
 
-
+    private FragmentMain fragmentMain;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FragmentMain fragmentMain = new FragmentMain();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.container_main, fragmentMain);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        if (savedInstanceState == null) {
+            String TAG = "ha";
+            Log.d(TAG, "onCreate: ");
 
+            fragmentMain = new FragmentMain();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.container_main, fragmentMain);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
+    }
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
 
+        @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
 //    public void replaceFragment(Fragment someFragment) {
