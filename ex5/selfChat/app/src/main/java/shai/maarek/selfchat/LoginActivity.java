@@ -27,12 +27,12 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private Context context;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.context = getApplicationContext();
         setContentView(R.layout.activity_login);
-        startMainIntent();
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = firebaseAuth -> {   // check if user is already logged in
