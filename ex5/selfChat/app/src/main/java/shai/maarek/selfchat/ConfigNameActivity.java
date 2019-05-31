@@ -13,17 +13,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Iterator;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ConfigNameActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String USERNAME = "username";
     private String userName;
     private DatabaseReference mDatabase;
     private final String uid = "constant_user";
     private EditText editText_enter_name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,24 +53,15 @@ public class ConfigNameActivity extends AppCompatActivity implements View.OnClic
         mDatabase.child("users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // if >1 then the user already entered their name. call main activity and send name
-//                if (dataSnapshot.getChildrenCount()>1){
-                Iterable iterable = dataSnapshot.getChildren();
-                Iterator iterator = iterable.iterator();
-                String name = "";
-                while (iterator.hasNext()) {
-                        DataSnapshot dataSnapshot1 = (DataSnapshot) iterator.next();
-                        name = dataSnapshot1.getKey();
-                        if (!name.equals("messages")){
-                            userName = name;
-                            break;
-                        }
-                    }
-                if (!userName.equals("")){
+                if (dataSnapshot.hasChild(USERNAME)) {
+                    userName = (String) dataSnapshot.child(USERNAME).getValue();
+                }
+
+                if (!"".equals(userName)) {
                     goToMainActivity(userName);
                 }
-//                }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -81,10 +72,10 @@ public class ConfigNameActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.button_my_name:
                 String username = editText_enter_name.getText().toString();
-                mDatabase.child("users").child(uid).child(username).setValue("-");
+                mDatabase.child("users").child(uid).child(USERNAME).setValue(username);
                 goToMainActivity(username);
                 break;
 
@@ -95,9 +86,9 @@ public class ConfigNameActivity extends AppCompatActivity implements View.OnClic
     }
 
 
-    private void goToMainActivity(String userNameParam){
+    private void goToMainActivity(String userNameParam) {
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
-        i.putExtra("username", userNameParam);
+        i.putExtra(USERNAME, userNameParam);
         startActivity(i);
 
     }

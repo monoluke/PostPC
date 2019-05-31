@@ -11,8 +11,8 @@ public class Message {//implements Parcelable {
     private String id;
     private String message;
     private long timestamp;
-//    private String manufacturer;
-//    private String model;
+    private String manufacturer;
+    private String model;
 
 
     // Ctors
@@ -59,18 +59,18 @@ public class Message {//implements Parcelable {
     }
 
 
-//    public void setManufacturer(String manufacturerParam) {
-//        this.manufacturer = manufacturerParam; // manufacturer == "xiaomi"
-//    }
-//
-//    public String getManufacturer(){ return this.manufacturer; }
-//
-//
-//    public void setModel(String modelParam){
-//        this.model = modelParam; // model == "redmi note 4"
-//    }
-//
-//    public String getModel() { return this.model; }
+    public void setManufacturer(String manufacturerParam) {
+        this.manufacturer = manufacturerParam; // manufacturer == "xiaomi"
+    }
+
+    public String getManufacturer(){ return this.manufacturer; }
+
+
+    public void setModel(String modelParam){
+        this.model = modelParam; // model == "redmi note 4"
+    }
+
+    public String getModel() { return this.model; }
 
 
 //

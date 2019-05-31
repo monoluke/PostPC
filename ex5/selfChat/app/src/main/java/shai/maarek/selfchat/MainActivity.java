@@ -209,8 +209,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             item.setTimestamp(timeInMillis);
             String key = mDatabase.child("users").child(uid).child("messages").push().getKey();
             item.setId(key);
-//            item.setManufacturer(android.os.Build.MANUFACTURER);
-//            item.setModel(android.os.Build.MODEL);
+            item.setManufacturer(android.os.Build.MANUFACTURER);
+            item.setModel(android.os.Build.MODEL);
             mDatabase.child("users").child(uid).child("messages").child(key).setValue(item);
             editText.setText("");
         }
