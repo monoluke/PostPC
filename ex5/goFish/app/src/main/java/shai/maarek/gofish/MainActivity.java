@@ -41,10 +41,5 @@ public class MainActivity extends AppCompatActivity  {
         super.onSaveInstanceState(outState);
     }
 
-//    public void replaceFragment(Fragment someFragment) {
-//        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//        transaction.replace(R.id.container_goFish, someFragment);
-//        transaction.addToBackStack(null);
-//        transaction.commit();
-//    }
+
 }

@@ -1,6 +1,5 @@
 package shai.maarek.selfchat;
 
-import android.app.AlertDialog;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,11 +8,10 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,12 +33,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     EditText editText;
     private static RecyclerViewAdapter adapter;
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mFirebaseUser;
     private DatabaseReference mDatabase;
     private MessageViewModel mMessageViewModel;
     private Boolean initialized = false;
     private long idSync = 0;
+    private final String uid = "constant_user";
 
     static class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
         private MessageViewModel mMessageViewModel = null;
@@ -80,13 +77,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        FirebaseApp.initializeApp(this);
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseApp.initializeApp(this);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        // get username if there is one.
+        Bundle extras = getIntent().getExtras();
+        String username = extras.getString("username");
+
+
+
         this.mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
         this.mMessageViewModel.clear();
         RecyclerView recyclerView = findViewById(R.id.recyclerView0);
@@ -99,7 +99,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button.setText(R.string.button);
         button.setOnClickListener(this);
 
-        mDatabase.child("users").child(mFirebaseUser.getUid()).addChildEventListener(new ChildEventListener() {
+        TextView textView_user_name = findViewById(R.id.textView4);
+        textView_user_name.setText(username);
+
+
+        mDatabase.child("users").child(uid).addChildEventListener(new ChildEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -131,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-        mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").addChildEventListener(new ChildEventListener() {
+        mDatabase.child("users").child(uid).child("messages").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (!initialized) {
@@ -178,18 +182,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onLongClick(View view, int position) {
-                new AlertDialog.Builder(view.getContext())
-                        .setTitle("Delete message?")
-                        .setMessage("The selected message will be deleted")
-                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            List<Message> messageList = mMessageViewModel.getmAllMessages().getValue();
-                            if (messageList != null && messageList.size() >= position) {
-                                Message messageToRemove = messageList.get(position);
-                                mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").child(messageToRemove.getId()).removeValue();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null)
-                        .show();
+//                new AlertDialog.Builder(view.getContext())
+//                        .setTitle("Delete message?")
+//                        .setMessage("The selected message will be deleted")
+//                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+//                            List<Message> messageList = mMessageViewModel.getmAllMessages().getValue();
+//                            if (messageList != null && messageList.size() >= position) {
+//                                Message messageToRemove = messageList.get(position);
+//                                mDatabase.child("users").child(uid).child("messages").child(messageToRemove.getId()).removeValue();
+//                            }
+//                        })
+//                        .setNegativeButton(android.R.string.no, null)
+//                        .show();
             }
         }));
     }
@@ -197,15 +201,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (editText.getText().toString().trim().equals("")) {
-            String EMPTY_STRING_MSG = "Bip Boop. You cannot send an empty message.";
+            String EMPTY_STRING_MSG = "Beep Boop. You cannot send an empty message.";
             Toast.makeText(getApplicationContext(), EMPTY_STRING_MSG, Toast.LENGTH_SHORT).show();
         } else {
             Message item = new Message(editText.getText().toString());
             long timeInMillis = Calendar.getInstance().getTimeInMillis() + ++idSync;
             item.setTimestamp(timeInMillis);
-            String key = mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").push().getKey();
+            String key = mDatabase.child("users").child(uid).child("messages").push().getKey();
             item.setId(key);
-            mDatabase.child("users").child(mFirebaseUser.getUid()).child("messages").child(key).setValue(item);
+//            item.setManufacturer(android.os.Build.MANUFACTURER);
+//            item.setModel(android.os.Build.MODEL);
+            mDatabase.child("users").child(uid).child("messages").child(key).setValue(item);
             editText.setText("");
         }
         this.editText.onEditorAction(EditorInfo.IME_ACTION_DONE);

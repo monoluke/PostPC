@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
                 startMainIntent();
             }
         };
-
+//
         SignInButton mGoogleBtn = findViewById(R.id.googlebtn);
         mGoogleBtn.setOnClickListener(view -> signIn());
 

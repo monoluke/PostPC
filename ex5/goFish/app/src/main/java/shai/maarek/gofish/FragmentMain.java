@@ -48,7 +48,7 @@ public class FragmentMain extends Fragment implements View.OnClickListener {
 
     public void onHiddenChanged(boolean hidden) {
         if (!hidden && FragmentDigits.CHOSEN_DIGITS != null) {
-            this.digitsShow.setText(new String(FragmentDigits.CHOSEN_DIGITS));
+            this.digitsShow.setText( new String(FragmentDigits.CHOSEN_DIGITS));
             FragmentDigits.CHOSEN_DIGITS = null;
         }
     }
