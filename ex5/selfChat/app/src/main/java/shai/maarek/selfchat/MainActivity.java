@@ -1,5 +1,7 @@
 package shai.maarek.selfchat;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,7 +32,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SuicidalFragmentListener {
     EditText editText;
     private static RecyclerViewAdapter adapter;
     private DatabaseReference mDatabase;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Boolean initialized = false;
     private long idSync = 0;
     private final String uid = "constant_user";
+    public static boolean DeleteMessage;
 
     static class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
         private MessageViewModel mMessageViewModel = null;
@@ -81,10 +84,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
+
+
         // get username if there is one.
+        // todo unmark it
         Bundle extras = getIntent().getExtras();
         String username = extras.getString("username");
-
+//        String username = "Vecino";
 
 
         this.mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
@@ -95,7 +102,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         Button button = findViewById(R.id.Button0);
         this.editText = findViewById(R.id.editText0);
-        this.editText.setText("");
+
+
+//        this.editText.setText("");
         button.setText(R.string.button);
         button.setOnClickListener(this);
 
@@ -182,6 +191,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onLongClick(View view, int position) {
+                List<Message> messageList = mMessageViewModel.getmAllMessages().getValue();
+                Message messageToRemove = messageList.get(position);
+                FragmentDeleteMsg.messageID = mDatabase.child("users").child(uid).child("messages").child(messageToRemove.getId()).getKey();
+                FragmentDeleteMsg fragmentDeleteMsg= new FragmentDeleteMsg();
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.container_delete_msg, fragmentDeleteMsg, FragmentDeleteMsg.FRAG_DEL_MSG_TAG);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
 //                new AlertDialog.Builder(view.getContext())
 //                        .setTitle("Delete message?")
 //                        .setMessage("The selected message will be deleted")
@@ -217,6 +236,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.editText.onEditorAction(EditorInfo.IME_ACTION_DONE);
         this.editText.setText("");
     }
+
+    @Override
+    public void onFragmentSuicide(String tag) {
+        // Check tag if you do this with more than one fragmen, then:
+        getFragmentManager().popBackStackImmediate();
+        // delete message
+        mDatabase.child("users").child(uid).child("messages").child(FragmentDeleteMsg.messageID).removeValue();
+        Log.d("FUCK", "onFragmentSuicide: ");
+    }
+
 }
 
 
