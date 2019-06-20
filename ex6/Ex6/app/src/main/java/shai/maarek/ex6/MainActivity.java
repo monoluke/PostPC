@@ -1,13 +1,19 @@
 package shai.maarek.ex6;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     public static String OUTGOING_PHONE_NUMBER = "OUTGOING_PHONE_NUMBER";
     public static String SHARED_PREF = "MyPref";
+    NotificationCompat.Builder builder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(SHARED_PREF, 0); // 0 - for private mode
 
 
-
+//        createNotificationChannel();
+//        sendNotification("test", "is there anybody out there?");
         TextView title = findViewById(R.id.textViewTitle);
         title.setText("Settings");
 
@@ -65,11 +74,13 @@ public class MainActivity extends AppCompatActivity {
         phone_number = findViewById(R.id.editText_phone_number);
         phone_number.addTextChangedListener(watch);
 
-//        Intent intent = getIntent();
-//        String outgoingPhoneCallNum = "";
-//        if (intent.getExtras() != null){
-//            outgoingPhoneCallNum = intent.getStringExtra(OUTGOING_PHONE_NUMBER);
-//        }
+
+        SendBroadcastReceiver sendBroadcastReceiver = new SendBroadcastReceiver();
+        DeliveryBroadcastReceiver deliveryBroadcastReceiver = new DeliveryBroadcastReceiver();
+
+        registerReceiver(sendBroadcastReceiver, new IntentFilter(Constants.SMS_SENT));
+        registerReceiver(deliveryBroadcastReceiver, new IntentFilter(Constants.SMS_DELIVERED));
+
 
         if (sharedPreferences.contains("custom_message")){
             custom_message.setText(sharedPreferences.getString("custom_message", ""));
@@ -77,58 +88,20 @@ public class MainActivity extends AppCompatActivity {
         if(sharedPreferences.contains("phone_number")){
             phone_number.setText(sharedPreferences.getString("phone_number", ""));
         }
+        createNotificationChannel(this);
 
-
-
-//        phone_number.addTextChangedListener(new TextWatcher() {
-//
-//        @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                Log.d("A", "beforeTextChanged: ");
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                Log.d("B", "onTextChanged: "  );
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                Log.d("C", "afterTextChanged: ");
-//                if (s.length() < 1){
-//                    emptyField.setText("Please enter phone number and text message above");
-//                }
-//                else{
-//                    emptyField.setText("");
-//                }
-//            }
-//        });
-
-        // The   request code used in ActivityCompat.requestPermissions()
-// and returned in the Activity's onRequestPermissionsResult()
-
-
-//            hasSmsPermission =
-//                    ActivityCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) ==
-//                            PackageManager.PERMISSION_GRANTED;
-//            if (!hasSmsPermission) {
-//                ActivityCompat.requestPermissions(
-//                        activity,
-//                        new String[]{Manifest.permission.SEND_SMS},
-//                        REQUEST_CODE_PERMISSION_SMS);
-//            }
-
+//        updateNotification("update", "coucou");
     }
 
     TextWatcher watch = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            Log.d("A", "beforeTextChanged: ");
+//            Log.d("A", "beforeTextChanged: ");
         }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Log.d("B", "onTextChanged: ");
+//            Log.d("B", "onTextChanged: ");
             if (phone_number.getText().length() < 1 && custom_message.getText().length() < 1){
                 emptyField.setText("Please enter a phone number and text message");
             }
@@ -153,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable s) {
-            Log.d("C", "afterTextChanged: ");
+//            Log.d("C", "afterTextChanged: ");
         }
     };
 
@@ -203,65 +176,11 @@ public class MainActivity extends AppCompatActivity {
                 i++;
             }
         }
-
-
-//        if (grantResults[SEND_SMS] == PackageManager.PERMISSION_GRANTED) {
-//            sendSms(); // cool
-//            Log.d("+_+_+ A", "Permission granted onRequestPermissionsResult: " + requestCode + " +_+_+");
-//        }
-//        else {
-//            // the user has denied our request! =-O
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)) {
-//                Log.d("+_+_+ denied", "SEND_SMS onRequestPermissionsResult: +_+_+");
-//                final MainActivity activity = this;
-//                boolean hasSmsPermission =
-//                        ActivityCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) ==
-//                                PackageManager.PERMISSION_GRANTED;
-//                if (!hasSmsPermission) {
-//                    ActivityCompat.requestPermissions(
-//                            activity,
-//                            new String[]{Manifest.permission.SEND_SMS},
-//                            REQUEST_CODE_PERMISSION_SMS);
-//                }
-                // reached here? means we asked the user for this permission more than once,
-                // and they still refuse. This would be a good time to open up a dialog
-                // explaining why we need this permission
-//            }
-//        }
-//        if (grantResults[PHONE_STATE] == PackageManager.PERMISSION_GRANTED) {
-//            Log.d("+_+_+ A", "Permission granted onRequestPermissionsResult: " + requestCode + " +_+_+");
-//        }
-//        else{
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE)) {
-//                Log.d("+_+_+ denied", "READ_PHONE_STATE onRequestPermissionsResult: +_+_+");
-//                final MainActivity activity = this;
-//                boolean hasReadPhoneStatePermission =
-//                        ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE) ==
-//                                PackageManager.PERMISSION_GRANTED;
-//                if (!hasReadPhoneStatePermission) {
-//                    ActivityCompat.requestPermissions(
-//                            activity,
-//                            new String[]{Manifest.permission.READ_PHONE_STATE},
-//                            REQUEST_CODE_PERMISSION_SMS);
-//                }
-                // reached here? means we asked the user for this permission more than once,
-                // and they still refuse. This would be a good time to open up a dialog
-                // explaining why we need this permission
-//            }
-//        }
         if (! isAllGranted){
             requestPermissions();
         }
     }
-//
-//    private void sendSms() {
-//        SmsManager.getDefault().sendTextMessage(
-//                "+972-5452-334-48",
-//                null,
-//                "BUHAHHAHAHAH",
-//                null,
-//                null);
-//    }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -276,4 +195,71 @@ public class MainActivity extends AppCompatActivity {
         custom_message.setText(savedInstanceState.getString("custom_message"));
         phone_number.setText(savedInstanceState.getString("phone_number"));
     }
+
+//    private void  createNotificationChannel() {
+//        // Create the NotificationChannel, but only on API 26+ because
+//        // the NotificationChannel class is new and not in the support library
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+////            CharSequence name = getString(R.string.channel_name);
+//            CharSequence name = "ChannelName";
+////            String description = getString(R.string.channel_description);
+//            String description = "ChannelDescription";
+//            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+//            NotificationChannel channel = new NotificationChannel(PhoneReceiver.CHANNEL_ID, name, importance);
+//            channel.setDescription(description);
+//            // Register the channel with the system; you can't change the importance
+//            // or other notification behaviors after this
+//            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+//            notificationManager.createNotificationChannel(channel);
+//        }
+//    }
+//
+//    private void sendNotification(String textTitle, String textContent){
+//        int notificationId = 112;
+//        this.builder = new NotificationCompat.Builder(this, PhoneReceiver.CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+//                .setContentTitle(textTitle)
+//                .setContentText(textContent)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        notificationManager.notify(notificationId, builder.build());
+//    }
+//
+//    private void updateNotification(String textTitle, String textContent){
+//        this.builder.setContentTitle(textTitle);
+//        this.builder.setContentText(textContent);
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        notificationManager.notify(112, builder.build());
+//    }
+
+
+
+    private void createNotificationChannel(Context context) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            CharSequence name = getString(R.string.channel_name);
+            CharSequence name = "ChannelName";
+//            String description = getString(R.string.channel_description);
+            String description = "ChannelDescription";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(Constants.NOTIFY_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+//    private void sendNotification(Context context, String textTitle, String textContent) {
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constants.NOTIFY_CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+//                .setContentTitle(textTitle)
+//                .setContentText(textContent)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+//        notificationManager.notify(Constants.NOTIFICATION_ID, builder.build());
+//    }
 }
+

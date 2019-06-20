@@ -26,6 +26,25 @@
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".SendBroadcastReceiver">
+            <intent-filter>
+                <action android:name="SMS_SENT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".DeliveryBroadcastReceiver">
+            <intent-filter>
+                <action android:name="SMS_DELIVERED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:enabled="true" android:name=".SendingSMSService" />
+
+        <service android:enabled="true" android:name=".SentSMSService" />
+
+        <service android:enabled="true" android:name=".DeliveredSMSService" />
+
     </application>
 
 
